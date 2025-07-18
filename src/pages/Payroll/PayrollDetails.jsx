@@ -188,7 +188,7 @@ const PayrollDetails = () => {
                   Department
                 </label>
                 <p className="mt-1 text-sm text-gray-900">
-                  {payroll.employee.employmentDetails.department}
+                  {payroll.employee.employmentDetails?.department}
                 </p>
               </div>
               <div>
@@ -196,7 +196,7 @@ const PayrollDetails = () => {
                   Position
                 </label>
                 <p className="mt-1 text-sm text-gray-900">
-                  {payroll.employee.employmentDetails.position}
+                  {payroll.employee.employmentDetails?.position}
                 </p>
               </div>
             </div>
@@ -243,7 +243,7 @@ const PayrollDetails = () => {
               <div className="flex justify-between items-center py-2 border-b border-gray-200">
                 <span className="text-sm text-gray-600">Basic Salary</span>
                 <span className="text-sm font-medium text-gray-900">
-                  ${payroll.earnings.basicSalary.toLocaleString()}
+                  ${payroll.earnings.basicSalary?.toLocaleString()}
                 </span>
               </div>
               {payroll.earnings.allowances &&
@@ -258,7 +258,7 @@ const PayrollDetails = () => {
                           {allowance.type}
                         </span>
                         <span className="text-sm font-medium text-gray-900">
-                          ${allowance.amount.toLocaleString()}
+                          ${allowance.amount?.toLocaleString()}
                         </span>
                       </div>
                     ))}
@@ -268,14 +268,14 @@ const PayrollDetails = () => {
                 <div className="flex justify-between items-center py-2 border-b border-gray-200">
                   <span className="text-sm text-gray-600">Overtime Pay</span>
                   <span className="text-sm font-medium text-gray-900">
-                    ${payroll.earnings.overtimePay.toLocaleString()}
+                    ${payroll.earnings.overtimePay?.toLocaleString()}
                   </span>
                 </div>
               )}
               <div className="flex justify-between items-center py-2 font-medium">
                 <span className="text-gray-900">Total Earnings</span>
                 <span className="text-gray-900">
-                  ${payroll.earnings.totalEarnings.toLocaleString()}
+                  ${payroll.earnings.totalEarnings?.toLocaleString()}
                 </span>
               </div>
             </div>
@@ -291,7 +291,7 @@ const PayrollDetails = () => {
                 <div className="flex justify-between items-center py-2 border-b border-gray-200">
                   <span className="text-sm text-gray-600">Tax</span>
                   <span className="text-sm font-medium text-gray-900">
-                    ${payroll.deductions.tax.toLocaleString()}
+                    ${payroll.deductions.tax?.toLocaleString()}
                   </span>
                 </div>
               )}
@@ -299,7 +299,7 @@ const PayrollDetails = () => {
                 <div className="flex justify-between items-center py-2 border-b border-gray-200">
                   <span className="text-sm text-gray-600">Insurance</span>
                   <span className="text-sm font-medium text-gray-900">
-                    ${payroll.deductions.insurance.toLocaleString()}
+                    ${payroll.deductions.insurance?.toLocaleString()}
                   </span>
                 </div>
               )}
@@ -307,7 +307,7 @@ const PayrollDetails = () => {
                 <div className="flex justify-between items-center py-2 border-b border-gray-200">
                   <span className="text-sm text-gray-600">Provident Fund</span>
                   <span className="text-sm font-medium text-gray-900">
-                    ${payroll.deductions.providentFund.toLocaleString()}
+                    ${payroll.deductions.providentFund?.toLocaleString()}
                   </span>
                 </div>
               )}
@@ -334,7 +334,7 @@ const PayrollDetails = () => {
               <div className="flex justify-between items-center py-2 font-medium">
                 <span className="text-gray-900">Total Deductions</span>
                 <span className="text-gray-900">
-                  ${payroll.deductions.totalDeductions.toLocaleString()}
+                  ${payroll.deductions.totalDeductions?.toLocaleString()}
                 </span>
               </div>
             </div>
@@ -350,13 +350,13 @@ const PayrollDetails = () => {
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Gross Salary</span>
                 <span className="text-sm font-medium text-gray-900">
-                  ${payroll.earnings.totalEarnings.toLocaleString()}
+                  ${payroll.earnings.totalEarnings?.toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Total Deductions</span>
                 <span className="text-sm font-medium text-gray-900">
-                  ${payroll.deductions.totalDeductions.toLocaleString()}
+                  ${payroll.deductions.totalDeductions?.toLocaleString()}
                 </span>
               </div>
               <div className="border-t border-gray-200 pt-4">
@@ -365,7 +365,7 @@ const PayrollDetails = () => {
                     Net Salary
                   </span>
                   <span className="text-lg font-bold text-primary-600">
-                    ${payroll.netSalary.toLocaleString()}
+                    ${payroll.netSalary?.toLocaleString()}
                   </span>
                 </div>
               </div>

@@ -1,70 +1,101 @@
-import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { useAuth } from '../../contexts/AuthContext'
-import { employeesAPI } from '../../services/api'
-import { PlusIcon, PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline'
-import LoadingSpinner from '../../components/UI/LoadingSpinner'
-import Badge from '../../components/UI/Badge'
-import Pagination from '../../components/UI/Pagination'
-import Modal from '../../components/UI/Modal'
-import toast from 'react-hot-toast'
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import { employeesAPI, departmentsAPI } from "../../services/api";
+import {
+  PlusIcon,
+  PencilIcon,
+  TrashIcon,
+  EyeIcon,
+} from "@heroicons/react/24/outline";
+import LoadingSpinner from "../../components/UI/LoadingSpinner";
+import Badge from "../../components/UI/Badge";
+import Pagination from "../../components/UI/Pagination";
+import Modal from "../../components/UI/Modal";
+import toast from "react-hot-toast";
 
 const EmployeesList = () => {
-  const { hasPermission } = useAuth()
-  const [employees, setEmployees] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [pagination, setPagination] = useState({ current: 1, pages: 1, total: 0 })
-  const [filters, setFilters] = useState({ department: '', type: '', isActive: '' })
-  const [deleteModal, setDeleteModal] = useState({ open: false, employee: null })
+  const { hasPermission } = useAuth();
+  const [employees, setEmployees] = useState([]);
+  const [departments, setDepartments] = useState([]); // <-- Add this line
+  const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pages: 1,
+    total: 0,
+  });
+  const [filters, setFilters] = useState({
+    department: "",
+    type: "",
+    isActive: "",
+  });
+  const [deleteModal, setDeleteModal] = useState({
+    open: false,
+    employee: null,
+  });
 
   useEffect(() => {
-    fetchEmployees()
-  }, [pagination.current, filters])
+    fetchDepartments(); // <-- Fetch departments on mount
+  }, []);
+
+  useEffect(() => {
+    fetchEmployees();
+  }, [pagination.current, filters]);
+
+  const fetchDepartments = async () => {
+    try {
+      const res = await departmentsAPI.getAll();
+      setDepartments(res.data.data);
+    } catch {
+      setDepartments([]);
+    }
+  };
 
   const fetchEmployees = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const params = {
         page: pagination.current,
         limit: 10,
-        ...filters
-      }
-      const response = await employeesAPI.getAll(params)
-      setEmployees(response.data.data.employees)
-      setPagination(response.data.data.pagination)
+        ...filters,
+      };
+      const response = await employeesAPI.getAll(params);
+      console.log(response);
+      setEmployees(response.data.data.employees);
+      setPagination(response.data.data.pagination);
     } catch (error) {
-      toast.error('Failed to fetch employees')
+      toast.error("Failed to fetch employees");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleDelete = async () => {
     try {
-      await employeesAPI.delete(deleteModal.employee._id)
-      toast.success('Employee deleted successfully')
-      setDeleteModal({ open: false, employee: null })
-      fetchEmployees()
+      await employeesAPI.delete(deleteModal.employee._id);
+      toast.success("Employee deleted successfully");
+      setDeleteModal({ open: false, employee: null });
+      fetchEmployees();
     } catch (error) {
-      toast.error('Failed to delete employee')
+      toast.error("Failed to delete employee");
     }
-  }
+  };
 
   const getTypeBadgeVariant = (type) => {
     const variants = {
-      Permanent: 'success',
-      Contractual: 'warning',
-      Freelancer: 'info'
-    }
-    return variants[type] || 'default'
-  }
+      Permanent: "success",
+      Contractual: "warning",
+      Freelancer: "info",
+    };
+    return variants[type] || "default";
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <LoadingSpinner size="large" />
       </div>
-    )
+    );
   }
 
   return (
@@ -73,9 +104,11 @@ const EmployeesList = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Employees</h1>
-          <p className="text-gray-600">Manage employee profiles and information</p>
+          <p className="text-gray-600">
+            Manage employee profiles and information
+          </p>
         </div>
-        {hasPermission('create_employee') && (
+        {hasPermission("create_employee") && (
           <Link to="/employees/new" className="btn-primary">
             <PlusIcon className="h-5 w-5 mr-2" />
             Add Employee
@@ -87,17 +120,28 @@ const EmployeesList = () => {
       <div className="card">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
-            <input
-              type="text"
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Department
+            </label>
+            <select
               value={filters.department}
-              onChange={(e) => setFilters({ ...filters, department: e.target.value })}
+              onChange={(e) =>
+                setFilters({ ...filters, department: e.target.value })
+              }
               className="input-field"
-              placeholder="Filter by department"
-            />
+            >
+              <option value="">All Departments</option>
+              {departments.map((dept) => (
+                <option key={dept._id} value={dept.name}>
+                  {dept.name}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Type
+            </label>
             <select
               value={filters.type}
               onChange={(e) => setFilters({ ...filters, type: e.target.value })}
@@ -105,25 +149,36 @@ const EmployeesList = () => {
             >
               <option value="">All Types</option>
               <option value="Permanent">Permanent</option>
-              <option value="Contractual">Contractual</option>
-              <option value="Freelancer">Freelancer</option>
+              <option value="Full time Contractual">
+                Full time Contractual
+              </option>
+              <option value="Part time Contractual">
+                Part time Contractual
+              </option>
+              <option value="Daily Wages">Daily Wages</option>
+              <option value="Visiting Faculty">Visiting Faculty</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
             <select
               value={filters.isActive}
-              onChange={(e) => setFilters({ ...filters, isActive: e.target.value })}
+              onChange={(e) =>
+                setFilters({ ...filters, isActive: e.target.value })
+              }
               className="input-field"
             >
-              <option value="">All Status</option>
               <option value="true">Active</option>
               <option value="false">Inactive</option>
             </select>
           </div>
           <div className="flex items-end">
             <button
-              onClick={() => setFilters({ department: '', type: '', isActive: '' })}
+              onClick={() =>
+                setFilters({ department: "", type: "", isActive: "" })
+              }
               className="btn-secondary"
             >
               Clear Filters
@@ -152,7 +207,8 @@ const EmployeesList = () => {
                   <td className="table-cell">
                     <div>
                       <div className="font-medium text-gray-900">
-                        {employee.personalInfo.firstName} {employee.personalInfo.lastName}
+                        {employee.personalInfo.firstName}{" "}
+                        {employee.personalInfo.lastName}
                       </div>
                       <div className="text-sm text-gray-500">
                         ID: {employee.employeeId}
@@ -175,13 +231,17 @@ const EmployeesList = () => {
                     </div>
                   </td>
                   <td className="table-cell">
-                    <Badge variant={getTypeBadgeVariant(employee.employmentDetails.type)}>
+                    <Badge
+                      variant={getTypeBadgeVariant(
+                        employee.employmentDetails.type
+                      )}
+                    >
                       {employee.employmentDetails.type}
                     </Badge>
                   </td>
                   <td className="table-cell">
-                    <Badge variant={employee.isActive ? 'success' : 'danger'}>
-                      {employee.isActive ? 'Active' : 'Inactive'}
+                    <Badge variant={employee.isActive ? "success" : "danger"}>
+                      {employee.isActive ? "Active" : "Inactive"}
                     </Badge>
                   </td>
                   <td className="table-cell">
@@ -192,7 +252,7 @@ const EmployeesList = () => {
                       >
                         <EyeIcon className="h-4 w-4" />
                       </Link>
-                      {hasPermission('update_employee') && (
+                      {hasPermission("update_employee") && (
                         <Link
                           to={`/employees/${employee._id}/edit`}
                           className="text-gray-600 hover:text-gray-900"
@@ -200,9 +260,11 @@ const EmployeesList = () => {
                           <PencilIcon className="h-4 w-4" />
                         </Link>
                       )}
-                      {hasPermission('delete_employee') && (
+                      {hasPermission("delete_employee") && (
                         <button
-                          onClick={() => setDeleteModal({ open: true, employee })}
+                          onClick={() =>
+                            setDeleteModal({ open: true, employee })
+                          }
                           className="text-red-600 hover:text-red-900"
                         >
                           <TrashIcon className="h-4 w-4" />
@@ -238,7 +300,10 @@ const EmployeesList = () => {
       >
         <div className="space-y-4">
           <p className="text-gray-600">
-            Are you sure you want to delete employee "{deleteModal.employee?.personalInfo?.firstName} {deleteModal.employee?.personalInfo?.lastName}"? This action cannot be undone.
+            Are you sure you want to delete employee "
+            {deleteModal.employee?.personalInfo?.firstName}{" "}
+            {deleteModal.employee?.personalInfo?.lastName}"? This action cannot
+            be undone.
           </p>
           <div className="flex justify-end space-x-3">
             <button
@@ -254,7 +319,7 @@ const EmployeesList = () => {
         </div>
       </Modal>
     </div>
-  )
-}
+  );
+};
 
-export default EmployeesList
+export default EmployeesList;

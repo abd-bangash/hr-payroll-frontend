@@ -62,6 +62,12 @@ const Sidebar = ({ open, setOpen }) => {
       icon: ShieldCheckIcon, 
       show: hasPermission('read_audit') 
     },
+    { 
+      name: 'Departments', 
+      href: '/departments', 
+      icon: UserGroupIcon, 
+      show: hasPermission('read_department') 
+    },
   ].filter(item => item.show)
 
   return (
